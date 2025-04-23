@@ -1,7 +1,10 @@
 import { Container } from "inversify";
-import UserService from "./services/UserService";
-import UserServiceImp from "./services/UserServiceImp";
-
+import userService from "./services/userService";
+import userServiceImp from "./services/userServiceImp";
+import userController from "./controllers/userController";
 const container = new Container();
 
-container.bind<UserService>("UserService").to(UserServiceImp);
+container.bind<userService>("userService").to(userServiceImp);
+container.bind(userController).toSelf();
+
+export default container;
