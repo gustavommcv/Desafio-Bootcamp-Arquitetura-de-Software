@@ -1,12 +1,12 @@
 import { inject, injectable } from "inversify";
 import { Request, Response } from "express";
 import { matchedData } from "express-validator";
-import customError from "../util/CustomError";
 import UserService from "../services/UserService";
+import CustomError from "../util/CustomError";
 
 @injectable()
 export default class UserController {
-  constructor(@inject("userService") private userService: UserService) {}
+  constructor(@inject("UserService") private userService: UserService) {}
 
   private getUserLinks(userId: string) {
     return {
@@ -28,7 +28,7 @@ export default class UserController {
       });
     } catch (error) {
       if (error instanceof Error)
-        if (error instanceof customError) {
+        if (error instanceof CustomError) {
           response.status(error.status).json(error.message);
         } else {
           console.error("Internal Error:", error);

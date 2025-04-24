@@ -18,7 +18,7 @@ userRouter.get(
     .isUUID()
     .withMessage("Id must be a UUID"),
   validationErrors,
-  userController.getUserById
+  userController.getUserById.bind(userController)
 );
 
 export default userRouter;

@@ -1,0 +1,36 @@
+import { inject, injectable } from "inversify";
+import User from "../models/User";
+import AuthService from "./AuthService";
+import UserRepository from "../repositories/UserRepository";
+import CustomError from "../util/CustomError";
+import bcrypt from "bcrypt";
+
+@injectable()
+export default class AuthServiceImp implements AuthService {
+  constructor(
+    @inject("UserRepository") private userRepository: UserRepository
+  ) {}
+
+  async login(email: string, password: string): Promise<User> {
+    const user = await this.userRepository.findByEmail(email);
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    if (!passwordMatch) {
+      throw new CustomError("Password does not match", 401);
+    }
+
+    return new User(
+      user.id,
+      user.name,
+      user.email,
+      user.password,
+      user.created_at ? new Date(user.created_at) : new Date(),
+      user.updated_at ? new Date(user.updated_at) : new Date()
+    );;
+  }
+
+  async register(name: string, email: string, password: string): Promise<User> {
+    throw new Error("Method not implemented.");
+  }
+}
