@@ -10,6 +10,12 @@ export default class UserRepositoryImp implements UserRepository {
     this.tableName = "users";
   }
 
+  async findAll(): Promise<IUser[]> {
+    const results = await query(`SELECT * FROM ${this.tableName}`);
+
+    return results;
+  }
+
   async findByPK(pk: UUID): Promise<IUser | null> {
     const results = await query(
       `SELECT * FROM ${this.tableName}

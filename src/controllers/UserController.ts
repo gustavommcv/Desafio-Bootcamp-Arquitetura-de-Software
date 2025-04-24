@@ -8,6 +8,14 @@ import UserService from "../services/UserService";
 export default class UserController {
   constructor(@inject("userService") private userService: UserService) {}
 
+  private getUserLinks(userId: string) {
+    return {
+      self: { method: "GET", href: `/users/${userId}` },
+      update: { method: "PUT", href: `/users/${userId}` },
+      delete: { method: "DELETE", href: `/users/${userId}` },
+    };
+  }
+
   getUserById = async (request: Request, response: Response) => {
     try {
       const { id } = matchedData(request);
@@ -16,10 +24,7 @@ export default class UserController {
 
       response.status(200).json({
         data: user,
-        links: {
-          self: `/users/${user.id}`,
-          update: { method: "PUT", href: `/users/${user.id}` },
-        },
+        links: this.getUserLinks(user.id),
       });
     } catch (error) {
       if (error instanceof Error)
@@ -29,6 +34,28 @@ export default class UserController {
           console.error("Internal Error:", error);
           response.status(500).json({ error: "Internal Server Error" });
         }
+    }
+  };
+
+  getUsers = async (_: Request, response: Response) => {
+    try {
+      const users = await this.userService.findAllUsers();
+
+      const usersWithLinks = users.map((user) => ({
+        ...user,
+        links: this.getUserLinks(user.id),
+      }));
+
+      response.status(200).json({
+        data: usersWithLinks,
+        links: {
+          self: { method: "GET", href: "/users" },
+          create: { method: "POST", href: "/users" },
+        },
+      });
+    } catch (error) {
+      console.error("Internal Error:", error);
+      response.status(500).json({ error: "Internal Server Error" });
     }
   };
 }

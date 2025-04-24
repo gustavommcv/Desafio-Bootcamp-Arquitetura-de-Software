@@ -8,6 +8,8 @@ const userRouter = Router();
 
 const userController = container.get(UserController);
 
+userRouter.get("/", userController.getUsers);
+
 userRouter.get(
   "/:id",
   param("id")
