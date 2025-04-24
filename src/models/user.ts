@@ -1,24 +1,19 @@
-export default class user {
-  id?: string;
+export interface IUser {
+  id: string;
   name: string;
   email: string;
   password: string;
-  created_at?: Date;
-  updated_at?: Date;
+  created_at: Date | string;
+  updated_at: Date | string;
+}
 
-  constructor(data: {
-    id?: string;
-    name: string;
-    email: string;
-    password: string;
-    created_at?: Date;
-    updated_at?: Date;
-  }) {
-    this.id = data.id;
-    this.name = data.name;
-    this.email = data.email;
-    this.password = data.password;
-    this.created_at = data.created_at || new Date();
-    this.updated_at = data.updated_at || new Date();
-  }
+export default class user {
+  constructor(
+    public id: string,
+    public name: string,
+    public email: string,
+    public password: string,
+    public created_at: Date = new Date(),
+    public updated_at: Date = new Date()
+  ) {}
 }

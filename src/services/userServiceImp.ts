@@ -15,7 +15,14 @@ export default class userServiceImp implements userService {
 
     if (!data) throw new customError("User not found", 404);
 
-    const foundUser = new user(data);
+    const foundUser = new user(
+      data.id,
+      data.name,
+      data.email,
+      data.password,
+      data.created_at ? new Date(data.created_at) : new Date(),
+      data.updated_at ? new Date(data.updated_at) : new Date()
+    );
 
     return foundUser;
   }
