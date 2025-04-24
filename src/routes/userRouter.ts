@@ -2,11 +2,11 @@ import { Router } from "express";
 import { param } from "express-validator";
 import validationErrors from "../middlewares/validationErrors";
 import container from "../di-container";
-import userController from "../controllers/userController";
+import UserController from "../controllers/UserController";
 
 const userRouter = Router();
 
-const userControllerInstance = container.get(userController);
+const userController = container.get(UserController);
 
 userRouter.get(
   "/:id",
@@ -16,7 +16,7 @@ userRouter.get(
     .isUUID()
     .withMessage("Id must be a UUID"),
   validationErrors,
-  userControllerInstance.getUserById
+  userController.getUserById
 );
 
 export default userRouter;

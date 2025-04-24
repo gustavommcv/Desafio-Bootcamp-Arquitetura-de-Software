@@ -7,7 +7,7 @@ export interface IUser {
   updated_at: Date | string;
 }
 
-export default class user {
+export default class User {
   constructor(
     public id: string,
     public name: string,

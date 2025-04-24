@@ -1,6 +1,6 @@
 import { UUID } from "crypto";
-import user from "../models/user";
+import user from "../models/User";
 
-export default interface userService {
+export default interface UserService {
   findUserById(id: UUID): Promise<user>;
 }

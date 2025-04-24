@@ -1,19 +1,19 @@
 import { UUID } from "crypto";
-import userService from "./userService";
 import { inject } from "inversify";
-import userRepository from "../repositories/userRepository";
-import user from "../models/user";
-import customError from "../util/customError";
+import user from "../models/User";
+import UserService from "./UserService";
+import UserRepository from "../repositories/UserRepository";
+import CustomError from "../util/CustomError";
 
-export default class userServiceImp implements userService {
+export default class UserServiceImp implements UserService {
   constructor(
-    @inject("userRepository") private userRepository: userRepository
+    @inject("userRepository") private userRepository: UserRepository
   ) {}
 
   async findUserById(id: UUID): Promise<user> {
     const data = await this.userRepository.findByPK(id);
 
-    if (!data) throw new customError("User not found", 404);
+    if (!data) throw new CustomError("User not found", 404);
 
     const foundUser = new user(
       data.id,

@@ -1,9 +1,9 @@
 import { UUID } from "crypto";
-import userRepository from "./userRepository";
 import { query } from "../database/database";
-import { IUser } from "../models/user";
+import { IUser } from "../models/User";
+import UserRepository from "./UserRepository";
 
-export default class userRepositoryImp implements userRepository {
+export default class UserRepositoryImp implements UserRepository {
   tableName: string;
 
   constructor() {
@@ -17,6 +17,6 @@ export default class userRepositoryImp implements userRepository {
       [pk]
     );
 
-    return results[0] as IUser || null;
+    return (results[0] as IUser) || null;
   }
 }
