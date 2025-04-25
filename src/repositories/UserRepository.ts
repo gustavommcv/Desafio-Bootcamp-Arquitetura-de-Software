@@ -8,4 +8,5 @@ export default interface UserRepository {
   findByEmail(email: string): Promise<IUser>;
   create(user: UserRequestDTO): Promise<IUser>;
   ensureEmailIsAvailable(email: string): Promise<boolean>;
+  deleteByPK(pk: UUID): Promise<void>
 }

@@ -21,4 +21,6 @@ userRouter.get(
   userController.getUserById.bind(userController)
 );
 
+userRouter.delete("/", userController.deleteUser.bind(userController));
+
 export default userRouter;

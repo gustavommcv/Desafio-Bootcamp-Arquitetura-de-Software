@@ -12,6 +12,27 @@ export default class UserRepositoryImp implements UserRepository {
     this.tableName = "users";
   }
 
+  async deleteByPK(pk: UUID): Promise<void> {
+    try {
+      await this.findByPK(pk);
+
+      const result = await query(
+        `DELETE FROM ${this.tableName}
+       WHERE id = ?`,
+        [pk]
+      );
+
+      if (result.affectedRows === 0) {
+        throw new CustomError("No user deleted", 500);
+      }
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw new CustomError("Error while deleting user", 500);
+    }
+  }
+
   async ensureEmailIsAvailable(email: string): Promise<boolean> {
     try {
       await this.findByEmail(email);

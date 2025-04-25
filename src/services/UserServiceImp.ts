@@ -10,6 +10,10 @@ export default class UserServiceImp implements UserService {
     @inject("UserRepository") private userRepository: UserRepository
   ) {}
 
+  async deleteUser(id: UUID): Promise<void> {
+    await this.userRepository.deleteByPK(id);
+  }
+
   async findAllUsers(): Promise<UserResponseDTO[]> {
     const data = await this.userRepository.findAll();
 
