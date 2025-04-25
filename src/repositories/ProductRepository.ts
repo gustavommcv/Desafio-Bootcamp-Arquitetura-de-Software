@@ -1,8 +1,9 @@
+import { UUID } from "crypto";
 import { IProduct } from "../models/Product";
 
 export default interface ProductRepository {
   findAll(): Promise<IProduct[]>;
-  //   findByPK(pk: UUID): Promise<IUser>;
+    findByPK(pk: UUID): Promise<IProduct>;
   //   findByEmail(email: string): Promise<IUser>;
   //   create(user: UserRequestDTO): Promise<IUser>;
   //   ensureEmailIsAvailable(email: string): Promise<boolean>;
