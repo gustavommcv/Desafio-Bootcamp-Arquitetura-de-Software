@@ -19,6 +19,27 @@ export default class UserController {
     };
   }
 
+  getUserCount = async (_: Request, response: Response) => {
+    try {
+      const count = (await this.userService.findAllUsers()).length;
+
+      response.status(200).json({
+        data: { count },
+        links: {
+          self: { method: "GET", href: "/users/count" },
+          list: { method: "GET", href: "/users" },
+        },
+      });
+    } catch (error) {
+      if (error instanceof CustomError) {
+        response.status(error.status).json({ error: error.message });
+      } else {
+        console.error("Internal Error:", error);
+        response.status(500).json({ error: "Internal Server Error" });
+      }
+    }
+  };
+
   getUserById = async (request: Request, response: Response) => {
     try {
       const { id } = matchedData(request);
