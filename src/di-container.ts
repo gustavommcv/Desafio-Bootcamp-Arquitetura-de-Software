@@ -6,14 +6,23 @@ import UserService from "./services/UserService";
 import AuthController from "./controllers/AuthController";
 import AuthService from "./services/AuthService";
 import AuthServiceImp from "./services/AuthServiceImp";
+import ProductService from "./services/ProductService";
+import ProductServiceImp from "./services/ProductServiceImp";
+import ProductRepository from "./repositories/ProductRepository";
+import UserRepository from "./repositories/UserRepository";
+import ProductRepositoryImp from "./repositories/ProductRepositoryImp";
+import ProductController from "./controllers/ProductController";
 const container = new Container();
 
 container.bind<UserService>("UserService").to(UserServiceImp);
 container.bind<AuthService>("AuthService").to(AuthServiceImp);
+container.bind<ProductService>("ProductService").to(ProductServiceImp);
 
-container.bind<UserRepositoryImp>("UserRepository").to(UserRepositoryImp);
+container.bind<UserRepository>("UserRepository").to(UserRepositoryImp);
+container.bind<ProductRepository>("ProductRepository").to(ProductRepositoryImp);
 
 container.bind(userController).toSelf();
 container.bind(AuthController).toSelf();
+container.bind(ProductController).toSelf();
 
 export default container;
