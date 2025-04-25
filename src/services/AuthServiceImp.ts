@@ -4,6 +4,8 @@ import AuthService from "./AuthService";
 import UserRepository from "../repositories/UserRepository";
 import CustomError from "../util/CustomError";
 import bcrypt from "bcrypt";
+import hashPassword from "../util/hashPassword";
+import UserRequestDTO from "../dto/UserRequestDTO";
 
 @injectable()
 export default class AuthServiceImp implements AuthService {
@@ -27,10 +29,29 @@ export default class AuthServiceImp implements AuthService {
       user.password,
       user.created_at ? new Date(user.created_at) : new Date(),
       user.updated_at ? new Date(user.updated_at) : new Date()
-    );;
+    );
   }
 
   async register(name: string, email: string, password: string): Promise<User> {
-    throw new Error("Method not implemented.");
+    const isEmailAvailable = await this.userRepository.ensureEmailIsAvailable(email);
+
+    if (!isEmailAvailable) {
+      throw new CustomError("Email already registered", 409)
+    }
+
+    const hashedPassword = await hashPassword(password);
+
+    const userRequest = new UserRequestDTO(name, email, hashedPassword);
+
+    const createdUser = await this.userRepository.create(userRequest);
+
+    return new User(
+      createdUser.id,
+      createdUser.name,
+      createdUser.email,
+      createdUser.password,
+      createdUser.created_at ? new Date(createdUser.created_at) : new Date(),
+      createdUser.updated_at ? new Date(createdUser.updated_at) : new Date()
+    );
   }
 }
