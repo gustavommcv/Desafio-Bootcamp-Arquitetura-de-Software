@@ -12,15 +12,60 @@ export default class UserRepositoryImp implements UserRepository {
     this.tableName = "users";
   }
 
+  async updateByPK(pk: UUID, updates: Partial<UserRequestDTO>): Promise<IUser> {
+    try {
+      await this.ensureUserExists(pk);
+
+      const fieldsToUpdate = [];
+      const values = [];
+
+      if (updates.name) {
+        fieldsToUpdate.push("name = ?");
+        values.push(updates.name);
+      }
+
+      if (updates.email) {
+        fieldsToUpdate.push("email = ?");
+        values.push(updates.email);
+      }
+
+      if (updates.password) {
+        fieldsToUpdate.push("password = ?");
+        values.push(updates.password);
+      }
+
+      if (fieldsToUpdate.length === 0) {
+        throw new CustomError("No valid fields to update", 400);
+      }
+
+      fieldsToUpdate.push("updated_at = CURRENT_TIMESTAMP");
+
+      values.push(pk);
+
+      const queryString = `
+      UPDATE ${this.tableName} 
+      SET ${fieldsToUpdate.join(", ")} 
+      WHERE id = ?
+    `;
+
+      await query(queryString, values);
+
+      return await this.findByPK(pk);
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw new CustomError("Error while updating user", 500);
+    }
+  }
+
   async deleteByPK(pk: UUID): Promise<void> {
     try {
-      await this.findByPK(pk);
+      await this.ensureUserExists(pk);
 
-      const result = await query(
-        `DELETE FROM ${this.tableName}
-       WHERE id = ?`,
-        [pk]
-      );
+      const result = await query(`DELETE FROM ${this.tableName} WHERE id = ?`, [
+        pk,
+      ]);
 
       if (result.affectedRows === 0) {
         throw new CustomError("No user deleted", 500);
@@ -39,6 +84,17 @@ export default class UserRepositoryImp implements UserRepository {
       return false;
     } catch (error) {
       return true;
+    }
+  }
+
+  async ensureUserExists(pk: UUID): Promise<void> {
+    const results = await query(
+      `SELECT 1 FROM ${this.tableName} WHERE id = ? LIMIT 1`,
+      [pk]
+    );
+
+    if (!results[0]) {
+      throw new CustomError("User not found", 404);
     }
   }
 

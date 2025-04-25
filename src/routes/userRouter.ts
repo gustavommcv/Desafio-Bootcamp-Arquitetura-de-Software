@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { param } from "express-validator";
+import { body, param } from "express-validator";
 import validationErrors from "../middlewares/validationErrors";
 import container from "../di-container";
 import UserController from "../controllers/UserController";
@@ -22,5 +22,19 @@ userRouter.get(
 );
 
 userRouter.delete("/", userController.deleteUser.bind(userController));
+
+userRouter.put(
+  "/",
+  [
+    body("name").optional().isString().withMessage("Name must be a string"),
+    body("email").optional().isEmail().withMessage("Invalid email"),
+    body("password")
+      .optional()
+      .isStrongPassword()
+      .withMessage("Password too weak"),
+  ],
+  validationErrors,
+  userController.editUser.bind(userController)
+);
 
 export default userRouter;

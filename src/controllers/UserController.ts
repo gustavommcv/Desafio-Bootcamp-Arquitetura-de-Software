@@ -5,6 +5,7 @@ import UserService from "../services/UserService";
 import CustomError from "../util/CustomError";
 import { verifyToken } from "../util/auth";
 import { UUID } from "crypto";
+import UserRequestDTO from "../dto/UserRequestDTO";
 
 @injectable()
 export default class UserController {
@@ -31,7 +32,7 @@ export default class UserController {
     } catch (error) {
       if (error instanceof Error)
         if (error instanceof CustomError) {
-          response.status(error.status).json(error.message);
+          response.status(error.status).json({ message: error.message });
         } else {
           console.error("Internal Error:", error);
           response.status(500).json({ error: "Internal Server Error" });
@@ -80,11 +81,42 @@ export default class UserController {
     } catch (error) {
       if (error instanceof Error)
         if (error instanceof CustomError) {
-          response.status(error.status).json({message: error.message});
+          response.status(error.status).json({ message: error.message });
         } else {
           console.error("Internal Error:", error);
           response.status(500).json({ error: "Internal Server Error" });
         }
+    }
+  };
+
+  editUser = async (request: Request, response: Response) => {
+    try {
+      const token = request.cookies.jwtToken;
+
+      if (!token) {
+        throw new CustomError("Token not found", 401);
+      }
+
+      const { id } = verifyToken(token);
+      const userData = matchedData(request);
+
+      const updatedUser = await this.userService.updateUser(
+        id as UUID,
+        userData as UserRequestDTO
+      );
+
+      response.status(200).json({
+        message: "User updated successfully",
+        data: updatedUser,
+        links: this.getUserLinks(id),
+      });
+    } catch (error) {
+      if (error instanceof CustomError) {
+        response.status(error.status).json({ message: error.message });
+      } else {
+        console.error("Internal Error:", error);
+        response.status(500).json({ error: "Internal Server Error" });
+      }
     }
   };
 }
