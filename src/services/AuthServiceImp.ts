@@ -6,6 +6,7 @@ import CustomError from "../util/CustomError";
 import bcrypt from "bcrypt";
 import hashPassword from "../util/hashPassword";
 import UserRequestDTO from "../dto/UserRequestDTO";
+import UserResponseDTO from "../dto/UserResponseDTO";
 
 @injectable()
 export default class AuthServiceImp implements AuthService {
@@ -13,7 +14,7 @@ export default class AuthServiceImp implements AuthService {
     @inject("UserRepository") private userRepository: UserRepository
   ) {}
 
-  async login(email: string, password: string): Promise<User> {
+  async login(email: string, password: string): Promise<UserResponseDTO> {
     const user = await this.userRepository.findByEmail(email);
 
     const passwordMatch = await bcrypt.compare(password, user.password);
@@ -29,10 +30,10 @@ export default class AuthServiceImp implements AuthService {
       user.password,
       user.created_at ? new Date(user.created_at) : new Date(),
       user.updated_at ? new Date(user.updated_at) : new Date()
-    );
+    ).toUserResponse();
   }
 
-  async register(name: string, email: string, password: string): Promise<User> {
+  async register(name: string, email: string, password: string): Promise<UserResponseDTO> {
     const isEmailAvailable = await this.userRepository.ensureEmailIsAvailable(email);
 
     if (!isEmailAvailable) {
@@ -52,6 +53,6 @@ export default class AuthServiceImp implements AuthService {
       createdUser.password,
       createdUser.created_at ? new Date(createdUser.created_at) : new Date(),
       createdUser.updated_at ? new Date(createdUser.updated_at) : new Date()
-    );
+    ).toUserResponse();
   }
 }

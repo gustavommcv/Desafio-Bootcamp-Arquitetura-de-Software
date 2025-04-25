@@ -1,7 +1,7 @@
 import { UUID } from "crypto";
-import User from "../models/User";
+import UserResponseDTO from "../dto/UserResponseDTO";
 
 export default interface UserService {
-  findUserById(id: UUID): Promise<User>;
-  findAllUsers(): Promise<User[]>;
+  findUserById(id: UUID): Promise<UserResponseDTO>;
+  findAllUsers(): Promise<UserResponseDTO[]>;
 }

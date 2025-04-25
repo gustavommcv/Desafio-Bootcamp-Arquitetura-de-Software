@@ -10,7 +10,7 @@ indexRouter.get("/", (_: Request, response: Response) => {
   });
 });
 
-indexRouter.use("/user", userRouter);
+indexRouter.use("/users", userRouter);
 indexRouter.use("/auth", authRouter);
 
 export default indexRouter;

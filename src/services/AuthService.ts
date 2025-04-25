@@ -1,6 +1,6 @@
-import User from "../models/User";
+import UserResponseDTO from "../dto/UserResponseDTO";
 
 export default interface AuthService {
-  login(email: string, password: string): Promise<User>;
-  register(name: string, email: string, password: string): Promise<User>;
+  login(email: string, password: string): Promise<UserResponseDTO>;
+  register(name: string, email: string, password: string): Promise<UserResponseDTO>;
 }

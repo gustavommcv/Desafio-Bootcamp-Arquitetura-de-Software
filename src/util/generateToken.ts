@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
-import User from "../models/User";
+import UserResponseDTO from "../dto/UserResponseDTO";
 
-export default function generateToken(user: User): string {
+export default function generateToken(user: UserResponseDTO): string {
   const secretKey = process.env.JWT_SECRET as string;
   const token = jwt.sign(
     {
