@@ -79,4 +79,19 @@ export default class UserServiceImp implements UserService {
 
     return foundUser;
   }
+
+  async findUsersByName(name: string): Promise<UserResponseDTO[]> {
+    const data = await this.userRepository.findByName(name);
+
+    return data.map((user) =>
+      new User(
+        user.id,
+        user.name,
+        user.email,
+        user.password,
+        user.created_at ? new Date(user.created_at) : new Date(),
+        user.updated_at ? new Date(user.updated_at) : new Date()
+      ).toUserResponse()
+    );
+  }
 }

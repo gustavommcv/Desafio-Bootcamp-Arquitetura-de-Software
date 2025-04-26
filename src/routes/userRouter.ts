@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { body, param } from "express-validator";
+import { body, param, query } from "express-validator";
 import validationErrors from "../middlewares/validationErrors";
 import container from "../di-container";
 import UserController from "../controllers/UserController";
@@ -11,6 +11,13 @@ const userController = container.get(UserController);
 userRouter.get("/", userController.getUsers.bind(userController));
 
 userRouter.get("/count", userController.getUserCount.bind(userController));
+
+userRouter.get(
+  "/search",
+  query("name").notEmpty().withMessage("Name cannot be empty"),
+  validationErrors,
+  userController.searchUsersByName.bind(userController)
+);
 
 userRouter.get(
   "/:id",

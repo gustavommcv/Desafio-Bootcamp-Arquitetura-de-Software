@@ -145,4 +145,18 @@ export default class UserRepositoryImp implements UserRepository {
 
     return results[0] as IUser;
   }
+
+  async findByName(name: string): Promise<IUser[]> {
+    const results = await query(
+      `SELECT * FROM ${this.tableName}
+     WHERE name LIKE ?`,
+      [`%${name}%`]
+    );
+
+    if (results.length === 0) {
+      throw new CustomError("No users found with that name", 404);
+    }
+
+    return results as IUser[];
+  }
 }

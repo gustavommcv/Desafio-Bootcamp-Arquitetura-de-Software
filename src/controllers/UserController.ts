@@ -140,4 +140,31 @@ export default class UserController {
       }
     }
   };
+
+  searchUsersByName = async (request: Request, response: Response) => {
+    try {
+      const { name } = matchedData(request);
+      const users = await this.userService.findUsersByName(name);
+
+      const usersWithLinks = users.map((user) => ({
+        ...user,
+        links: this.getUserLinks(user.id),
+      }));
+
+      response.status(200).json({
+        data: usersWithLinks,
+        links: {
+          self: { method: "GET", href: `/users/name/${name}` },
+          all: { method: "GET", href: "/users" },
+        },
+      });
+    } catch (error) {
+      if (error instanceof CustomError) {
+        response.status(error.status).json({ message: error.message });
+      } else {
+        console.error("Search users error:", error);
+        response.status(500).json({ error: "Internal Server Error" });
+      }
+    }
+  };
 }

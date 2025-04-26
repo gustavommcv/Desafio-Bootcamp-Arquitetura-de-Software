@@ -7,4 +7,5 @@ export default interface UserService {
   findAllUsers(): Promise<UserResponseDTO[]>;
   updateUser(id: UUID, user: UserRequestDTO): Promise<UserResponseDTO>;
   deleteUser(id: UUID): Promise<void>;
+  findUsersByName(name: string): Promise<UserResponseDTO[]>;
 }

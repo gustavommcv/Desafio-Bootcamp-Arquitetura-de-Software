@@ -11,4 +11,5 @@ export default interface UserRepository {
   deleteByPK(pk: UUID): Promise<void>;
   ensureUserExists(pk: UUID): Promise<void>;
   updateByPK(pk: UUID, updates: Partial<UserRequestDTO>): Promise<IUser>;
+  findByName(name: string): Promise<IUser[]>;
 }
