@@ -8,5 +8,5 @@ export default interface ProductService {
   findProductsByName(name: string): Promise<Product[]>;
   createProduct(product: ProductRequestDTO): Promise<Product>;
   deleteProduct(id: UUID): Promise<void>;
-  //   updateUser(id: UUID, user: UserRequestDTO): Promise<UserResponseDTO>;
+  updateProduct(id: UUID, updates: ProductRequestDTO): Promise<Product>;
 }

@@ -11,6 +11,29 @@ export default class ProductServiceImp implements ProductService {
     @inject("ProductRepository") private productRepository: ProductRepository
   ) {}
 
+  async updateProduct(id: UUID, updates: ProductRequestDTO): Promise<Product> {
+    try {
+      const updatedProduct = await this.productRepository.updateByPK(
+        id,
+        updates
+      );
+
+      return new Product(
+        updatedProduct.id,
+        updatedProduct.name,
+        updatedProduct.description,
+        updatedProduct.price,
+        new Date(updatedProduct.created_at),
+        new Date(updatedProduct.updated_at)
+      );
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw new CustomError("Failed to update product", 500);
+    }
+  }
+
   async createProduct(product: ProductRequestDTO): Promise<Product> {
     const createdProduct = await this.productRepository.create(product);
 

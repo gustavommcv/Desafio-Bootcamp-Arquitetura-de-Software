@@ -30,6 +30,35 @@ productRouter.get(
   productController.getProductById.bind(productController)
 );
 
+productRouter.put(
+  "/:id",
+  [
+    param("id")
+      .notEmpty()
+      .withMessage("Id cannot be empty")
+      .isUUID()
+      .withMessage("Id must be a UUID"),
+    body("name")
+      .optional()
+      .isString()
+      .withMessage("Name must be a string")
+      .notEmpty()
+      .withMessage("Name cannot be empty"),
+    body("description")
+      .optional()
+      .isString()
+      .withMessage("Description must be a string"),
+    body("price")
+      .optional()
+      .isNumeric()
+      .withMessage("Price must be a number")
+      .custom((value) => value > 0)
+      .withMessage("Price must be greater than 0"),
+  ],
+  validationErrors,
+  productController.updateProduct.bind(productController)
+);
+
 productRouter.delete(
   "/:id",
   param("id")

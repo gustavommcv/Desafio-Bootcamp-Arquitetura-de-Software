@@ -131,6 +131,29 @@ export default class ProductController {
     }
   };
 
+  updateProduct = async (request: Request, response: Response) => {
+    try {
+      const { id, ...updateData } = matchedData(request);
+      const updatedProduct = await this.productService.updateProduct(
+        id,
+        updateData as ProductRequestDTO
+      );
+
+      response.status(200).json({
+        message: "Product updated successfully",
+        data: updatedProduct,
+        links: this.getProductLinks(updatedProduct.id),
+      });
+    } catch (error) {
+      if (error instanceof CustomError) {
+        response.status(error.status).json({ message: error.message });
+      } else {
+        console.error("Update product error:", error);
+        response.status(500).json({ error: "Internal Server Error" });
+      }
+    }
+  };
+
   deleteProduct = async (request: Request, response: Response) => {
     try {
       const { id } = matchedData(request);

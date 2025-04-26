@@ -12,6 +12,42 @@ export default class ProductRepositoryImp implements ProductRepository {
     this.tableName = "products";
   }
 
+  async updateByPK(pk: UUID, updates: Partial<IProduct>): Promise<IProduct> {
+    const fieldsToUpdate = [];
+    const values = [];
+
+    if (updates.name !== undefined) {
+      fieldsToUpdate.push("name = ?");
+      values.push(updates.name);
+    }
+
+    if (updates.description !== undefined) {
+      fieldsToUpdate.push("description = ?");
+      values.push(updates.description);
+    }
+
+    if (updates.price !== undefined) {
+      fieldsToUpdate.push("price = ?");
+      values.push(updates.price);
+    }
+
+    if (fieldsToUpdate.length === 0) {
+      throw new CustomError("No valid fields to update", 400);
+    }
+
+    fieldsToUpdate.push("updated_at = CURRENT_TIMESTAMP");
+    values.push(pk);
+
+    const queryString = `
+    UPDATE ${this.tableName} 
+    SET ${fieldsToUpdate.join(", ")} 
+    WHERE id = ?
+  `;
+
+    await query(queryString, values);
+    return await this.findByPK(pk);
+  }
+
   async deleteByPK(pk: UUID): Promise<void> {
     const result = await query(`DELETE FROM ${this.tableName} WHERE id = ?`, [
       pk,

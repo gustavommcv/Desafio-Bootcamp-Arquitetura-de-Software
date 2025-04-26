@@ -8,6 +8,5 @@ export default interface ProductRepository {
   findByName(name: string): Promise<IProduct[]>;
   create(product: ProductRequestDTO): Promise<IProduct>;
   deleteByPK(pk: UUID): Promise<void>;
-  //   ensureUserExists(pk: UUID): Promise<void>;
-  //   updateByPK(pk: UUID, updates: Partial<UserRequestDTO>): Promise<IUser>;
+  updateByPK(pk: UUID, updates: Partial<IProduct>): Promise<IProduct>;
 }
