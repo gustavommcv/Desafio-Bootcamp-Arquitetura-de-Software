@@ -28,6 +28,25 @@ export default class OrderController {
     };
   }
 
+  getOrderById = async (req: Request, res: Response) => {
+    try {
+      const { id } = req.params;
+      const order = await this.orderService.getOrderById(id);
+
+      res.status(200).json({
+        data: order.toResponseDTO(),
+        links: this.getOrderLinks(order.id),
+      });
+    } catch (error) {
+      if (error instanceof CustomError) {
+        res.status(error.status).json({ message: error.message });
+      } else {
+        console.error("Get order error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    }
+  };
+
   getAllOrders = async (_: Request, res: Response) => {
     try {
       const orders = await this.orderService.getAllOrders();

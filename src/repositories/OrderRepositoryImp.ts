@@ -54,4 +54,50 @@ export default class OrderRepositoryImp implements OrderRepository {
 
     return Array.from(ordersMap.values());
   }
+
+  async findById(id: string): Promise<IOrder | null> {
+    const [order] = await query(
+      `
+    SELECT 
+      o.*,
+      oi.id as item_id, 
+      oi.product_id, 
+      oi.quantity, 
+      oi.unit_price,
+      oi.created_at as item_created_at,
+      p.name as product_name
+    FROM orders o
+    LEFT JOIN order_items oi ON o.id = oi.order_id
+    LEFT JOIN products p ON oi.product_id = p.id
+    WHERE o.id = ?
+  `,
+      [id]
+    );
+
+    if (!order) return null;
+
+    const items = await query(
+      `
+    SELECT 
+      oi.*,
+      p.name as product_name
+    FROM order_items oi
+    JOIN products p ON oi.product_id = p.id
+    WHERE oi.order_id = ?
+  `,
+      [id]
+    );
+
+    return {
+      ...order,
+      items: items.map((item: any) => ({
+        id: item.id,
+        productId: item.product_id,
+        productName: item.product_name,
+        quantity: item.quantity,
+        unitPrice: item.unit_price,
+        createdAt: item.created_at,
+      })),
+    };
+  }
 }

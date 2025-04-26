@@ -6,9 +6,9 @@ export default interface OrderService {
   //     userId: string;
   //     items: Array<{ productId: string; quantity: number }>;
   //   }): Promise<Order>;
-  //   getOrderById(id: UUID): Promise<Order>;
   //   getUserOrders(userId: UUID): Promise<Order[]>;
   getAllOrders(): Promise<Order[]>;
+  getOrderById(id: string): Promise<Order>;
   //   updateOrder(id: UUID, updates: Partial<{ status: string }>): Promise<Order>;
   //   deleteOrder(id: UUID): Promise<void>;
 }
