@@ -1,5 +1,6 @@
 import { query } from "../database/database";
 import { IOrder } from "../models/Order";
+import CustomError from "../util/CustomError";
 import OrderRepository from "./OrderRepository";
 
 export default class OrderRepositoryImp implements OrderRepository {
@@ -106,5 +107,67 @@ export default class OrderRepositoryImp implements OrderRepository {
     });
 
     return orderData as IOrder;
+  }
+
+  async findByName(searchTerm: string): Promise<IOrder[]> {
+    const orders = await query(
+      `
+    SELECT DISTINCT
+      o.id,
+      o.user_id as userId,
+      o.order_date as orderDate,
+      o.total_amount as totalAmount,
+      o.created_at as createdAt,
+      o.updated_at as updatedAt,
+      u.name as userName,
+      p.name as productName
+    FROM orders o
+    JOIN users u ON o.user_id = u.id
+    LEFT JOIN order_items oi ON o.id = oi.order_id
+    LEFT JOIN products p ON oi.product_id = p.id
+    WHERE u.name LIKE ? OR p.name LIKE ?
+    ORDER BY o.order_date DESC
+  `,
+      [`%${searchTerm}%`, `%${searchTerm}%`]
+    );
+
+    if (orders.length === 0) {
+      throw new CustomError("No orders found matching the search term", 404);
+    }
+
+    // Agora busca os itens para cada pedido encontrado
+    const ordersWithItems = await Promise.all(
+      orders.map(async (order: any) => {
+        const items = await query(
+          `
+        SELECT 
+          oi.id,
+          oi.product_id as productId,
+          oi.quantity,
+          oi.unit_price as unitPrice,
+          oi.created_at as createdAt,
+          p.name as productName
+        FROM order_items oi
+        JOIN products p ON oi.product_id = p.id
+        WHERE oi.order_id = ?
+      `,
+          [order.id]
+        );
+
+        return {
+          ...order,
+          items: items.map((item: any) => ({
+            id: item.id,
+            productId: item.productId,
+            productName: item.productName,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            createdAt: item.createdAt ? new Date(item.createdAt) : null,
+          })),
+        };
+      })
+    );
+
+    return ordersWithItems;
   }
 }

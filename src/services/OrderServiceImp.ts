@@ -62,4 +62,30 @@ export default class OrderServiceImp implements OrderService {
         )
     );
   }
+
+  async searchOrdersByName(searchTerm: string): Promise<Order[]> {
+    const ordersData = await this.orderRepository.findByName(searchTerm);
+
+    return ordersData.map(
+      (orderData) =>
+        new Order(
+          orderData.id,
+          orderData.userId,
+          new Date(orderData.orderDate),
+          orderData.totalAmount,
+          orderData.items.map(
+            (item) =>
+              new OrderItem(
+                item.id,
+                item.productId,
+                item.quantity,
+                item.unitPrice,
+                new Date(item.createdAt)
+              )
+          ),
+          new Date(orderData.createdAt),
+          new Date(orderData.updatedAt)
+        )
+    );
+  }
 }

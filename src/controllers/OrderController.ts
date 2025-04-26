@@ -95,4 +95,31 @@ export default class OrderController {
       }
     }
   };
+
+  searchOrders = async (req: Request, res: Response) => {
+    try {
+      const { name } = req.query;
+      const orders = await this.orderService.searchOrdersByName(name as string);
+
+      const response = {
+        data: orders.map((order) => ({
+          ...order.toResponseDTO(),
+          links: this.getOrderLinks(order.id),
+        })),
+        links: {
+          self: { method: "GET", href: `/orders/search?name=${name}` },
+          all: { method: "GET", href: "/orders" },
+        },
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      if (error instanceof CustomError) {
+        res.status(error.status).json({ message: error.message });
+      } else {
+        console.error("Search orders error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    }
+  };
 }
