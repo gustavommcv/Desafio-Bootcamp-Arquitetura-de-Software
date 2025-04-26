@@ -12,17 +12,25 @@ import ProductRepository from "./repositories/ProductRepository";
 import UserRepository from "./repositories/UserRepository";
 import ProductRepositoryImp from "./repositories/ProductRepositoryImp";
 import ProductController from "./controllers/ProductController";
+import OrderService from "./services/OrderService";
+import OrderServiceImp from "./services/OrderServiceImp";
+import OrderRepository from "./repositories/OrderRepository";
+import OrderRepositoryImp from "./repositories/OrderRepositoryImp";
+import OrderController from "./controllers/OrderController";
 const container = new Container();
 
 container.bind<UserService>("UserService").to(UserServiceImp);
 container.bind<AuthService>("AuthService").to(AuthServiceImp);
 container.bind<ProductService>("ProductService").to(ProductServiceImp);
+container.bind<OrderService>("OrderService").to(OrderServiceImp);
 
 container.bind<UserRepository>("UserRepository").to(UserRepositoryImp);
 container.bind<ProductRepository>("ProductRepository").to(ProductRepositoryImp);
+container.bind<OrderRepository>("OrderRepository").to(OrderRepositoryImp);
 
 container.bind(userController).toSelf();
 container.bind(AuthController).toSelf();
 container.bind(ProductController).toSelf();
+container.bind(OrderController).toSelf();
 
 export default container;

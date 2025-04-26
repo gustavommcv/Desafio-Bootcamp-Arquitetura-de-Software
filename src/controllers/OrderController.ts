@@ -1,0 +1,56 @@
+import { Request, Response } from "express";
+import { inject, injectable } from "inversify";
+import OrderService from "../services/OrderService";
+import CustomError from "../util/CustomError";
+
+@injectable()
+export default class OrderController {
+  constructor(@inject("OrderService") private orderService: OrderService) {}
+
+  private getOrderLinks(orderId: string) {
+    return {
+      self: {
+        method: "GET",
+        href: `/orders/${orderId}`,
+      },
+      update: {
+        method: "PUT",
+        href: `/orders/${orderId}`,
+      },
+      delete: {
+        method: "DELETE",
+        href: `/orders/${orderId}`,
+      },
+      items: {
+        method: "GET",
+        href: `/orders/${orderId}/items`,
+      },
+    };
+  }
+
+  getAllOrders = async (_: Request, res: Response) => {
+    try {
+      const orders = await this.orderService.getAllOrders();
+
+      const response = {
+        data: orders.map((order) => ({
+          ...order.toResponseDTO(),
+          links: this.getOrderLinks(order.id),
+        })),
+        links: {
+          self: { method: "GET", href: "/orders" },
+          create: { method: "POST", href: "/orders" },
+        },
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      if (error instanceof CustomError) {
+        res.status(error.status).json({ message: error.message });
+      } else {
+        console.error("Get all orders error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    }
+  };
+}
