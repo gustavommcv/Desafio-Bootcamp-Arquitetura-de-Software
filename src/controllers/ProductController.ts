@@ -41,6 +41,23 @@ export default class ProductController {
     }
   };
 
+  getCount = async (_: Request, response: Response) => {
+    try {
+      const productsLenght = (await this.productService.findAllProducts()).length;
+
+      response.status(200).json({
+        data: productsLenght,
+        links: {
+          self: { method: "GET", href: "/products/count" },
+          create: { method: "POST", href: "/products" },
+        },
+      });
+    } catch (error) {
+      console.error("Internal Error:", error);
+      response.status(500).json({ error: "Internal Server Error" });
+    }
+  };
+
   getProductById = async (request: Request, response: Response) => {
     try {
       const { id } = matchedData(request);

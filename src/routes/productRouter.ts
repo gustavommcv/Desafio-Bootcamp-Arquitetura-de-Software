@@ -17,6 +17,8 @@ productRouter.get(
   productController.getProductByName.bind(productController)
 );
 
+productRouter.get("/count", productController.getCount.bind(productController));
+
 productRouter.get(
   "/:id",
   param("id")
