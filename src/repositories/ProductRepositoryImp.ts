@@ -3,6 +3,7 @@ import { query } from "../database/database";
 import { IProduct } from "../models/Product";
 import ProductRepository from "./ProductRepository";
 import CustomError from "../util/CustomError";
+import ProductRequestDTO from "../dto/ProductRequestDTO";
 
 export default class ProductRepositoryImp implements ProductRepository {
   tableName: string;
@@ -11,11 +12,24 @@ export default class ProductRepositoryImp implements ProductRepository {
     this.tableName = "products";
   }
 
+  async create(product: ProductRequestDTO): Promise<IProduct> {
+    const productId = crypto.randomUUID();
+
+    await query(
+      `INSERT INTO ${this.tableName} (id, name, description, price, created_at, updated_at)
+     VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`,
+      [productId, product.name, product.description, product.price]
+    );
+
+    const createdProduct = await this.findByPK(productId);
+    return createdProduct;
+  }
+
   async findByName(name: string): Promise<IProduct[]> {
     const results = await query(
       `SELECT * FROM ${this.tableName}
      WHERE name LIKE ?`,
-      [`%${name}%`] 
+      [`%${name}%`]
     );
 
     if (results.length === 0) {

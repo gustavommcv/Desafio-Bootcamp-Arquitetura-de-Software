@@ -3,6 +3,7 @@ import { inject, injectable } from "inversify";
 import ProductService from "../services/ProductService";
 import { matchedData } from "express-validator";
 import CustomError from "../util/CustomError";
+import ProductRequestDTO from "../dto/ProductRequestDTO";
 
 @injectable()
 export default class ProductController {
@@ -87,6 +88,28 @@ export default class ProductController {
           console.error("Internal Error:", error);
           response.status(500).json({ error: "Internal Server Error" });
         }
+    }
+  };
+
+  createProduct = async (request: Request, response: Response) => {
+    try {
+      const productData = matchedData(request);
+      const product = await this.productService.createProduct(
+        productData as ProductRequestDTO
+      );
+
+      response.status(201).json({
+        message: "Product created successfully",
+        data: product,
+        links: this.getProductLinks(product.id),
+      });
+    } catch (error) {
+      if (error instanceof CustomError) {
+        response.status(error.status).json({ message: error.message });
+      } else {
+        console.error("Create product error:", error);
+        response.status(500).json({ error: "Internal Server Error" });
+      }
     }
   };
 }

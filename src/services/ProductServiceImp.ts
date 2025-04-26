@@ -3,11 +3,25 @@ import Product from "../models/Product";
 import ProductService from "./ProductService";
 import ProductRepository from "../repositories/ProductRepository";
 import { UUID } from "crypto";
+import ProductRequestDTO from "../dto/ProductRequestDTO";
 
 export default class ProductServiceImp implements ProductService {
   constructor(
     @inject("ProductRepository") private productRepository: ProductRepository
   ) {}
+
+  async createProduct(product: ProductRequestDTO): Promise<Product> {
+    const createdProduct = await this.productRepository.create(product);
+
+    return new Product(
+      createdProduct.id,
+      createdProduct.name,
+      createdProduct.description,
+      createdProduct.price,
+      new Date(createdProduct.created_at),
+      new Date(createdProduct.updated_at)
+    );
+  }
 
   async findProductsByName(name: string): Promise<Product[]> {
     const searchName = name.trim();
