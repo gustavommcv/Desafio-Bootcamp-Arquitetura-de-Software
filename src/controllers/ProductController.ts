@@ -43,7 +43,8 @@ export default class ProductController {
 
   getCount = async (_: Request, response: Response) => {
     try {
-      const productsLenght = (await this.productService.findAllProducts()).length;
+      const productsLenght = (await this.productService.findAllProducts())
+        .length;
 
       response.status(200).json({
         data: productsLenght,
@@ -125,6 +126,28 @@ export default class ProductController {
         response.status(error.status).json({ message: error.message });
       } else {
         console.error("Create product error:", error);
+        response.status(500).json({ error: "Internal Server Error" });
+      }
+    }
+  };
+
+  deleteProduct = async (request: Request, response: Response) => {
+    try {
+      const { id } = matchedData(request);
+      await this.productService.deleteProduct(id);
+
+      response.status(200).json({
+        message: "Product deleted successfully",
+        links: {
+          list: { method: "GET", href: "/products" },
+          create: { method: "POST", href: "/products" },
+        },
+      });
+    } catch (error) {
+      if (error instanceof CustomError) {
+        response.status(error.status).json({ message: error.message });
+      } else {
+        console.error("Delete product error:", error);
         response.status(500).json({ error: "Internal Server Error" });
       }
     }

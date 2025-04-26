@@ -6,10 +6,8 @@ export default interface ProductRepository {
   findAll(): Promise<IProduct[]>;
   findByPK(pk: UUID): Promise<IProduct>;
   findByName(name: string): Promise<IProduct[]>;
-    create(product: ProductRequestDTO): Promise<IProduct>;
-  //   findByEmail(email: string): Promise<IUser>;
-  //   ensureEmailIsAvailable(email: string): Promise<boolean>;
-  //   deleteByPK(pk: UUID): Promise<void>;
+  create(product: ProductRequestDTO): Promise<IProduct>;
+  deleteByPK(pk: UUID): Promise<void>;
   //   ensureUserExists(pk: UUID): Promise<void>;
   //   updateByPK(pk: UUID, updates: Partial<UserRequestDTO>): Promise<IUser>;
 }

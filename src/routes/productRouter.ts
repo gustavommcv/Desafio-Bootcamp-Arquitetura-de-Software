@@ -30,6 +30,17 @@ productRouter.get(
   productController.getProductById.bind(productController)
 );
 
+productRouter.delete(
+  "/:id",
+  param("id")
+    .notEmpty()
+    .withMessage("Id cannot be empty")
+    .isUUID()
+    .withMessage("Id must be a UUID"),
+  validationErrors,
+  productController.deleteProduct.bind(productController)
+);
+
 productRouter.post(
   "/",
   [

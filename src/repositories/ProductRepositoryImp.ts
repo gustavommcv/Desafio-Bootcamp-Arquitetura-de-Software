@@ -12,6 +12,16 @@ export default class ProductRepositoryImp implements ProductRepository {
     this.tableName = "products";
   }
 
+  async deleteByPK(pk: UUID): Promise<void> {
+    const result = await query(`DELETE FROM ${this.tableName} WHERE id = ?`, [
+      pk,
+    ]);
+
+    if (result.affectedRows === 0) {
+      throw new CustomError("Product not found", 404);
+    }
+  }
+
   async create(product: ProductRequestDTO): Promise<IProduct> {
     const productId = crypto.randomUUID();
 

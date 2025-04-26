@@ -4,6 +4,7 @@ import ProductService from "./ProductService";
 import ProductRepository from "../repositories/ProductRepository";
 import { UUID } from "crypto";
 import ProductRequestDTO from "../dto/ProductRequestDTO";
+import CustomError from "../util/CustomError";
 
 export default class ProductServiceImp implements ProductService {
   constructor(
@@ -21,6 +22,17 @@ export default class ProductServiceImp implements ProductService {
       new Date(createdProduct.created_at),
       new Date(createdProduct.updated_at)
     );
+  }
+
+  async deleteProduct(id: UUID): Promise<void> {
+    try {
+      await this.productRepository.deleteByPK(id);
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw new CustomError("Failed to delete product", 500);
+    }
   }
 
   async findProductsByName(name: string): Promise<Product[]> {
