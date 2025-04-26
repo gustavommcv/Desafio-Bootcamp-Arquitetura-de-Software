@@ -56,48 +56,55 @@ export default class OrderRepositoryImp implements OrderRepository {
   }
 
   async findById(id: string): Promise<IOrder | null> {
-    const [order] = await query(
+    const orders = await query(
       `
-    SELECT 
-      o.*,
-      oi.id as item_id, 
-      oi.product_id, 
-      oi.quantity, 
-      oi.unit_price,
-      oi.created_at as item_created_at,
-      p.name as product_name
-    FROM orders o
-    LEFT JOIN order_items oi ON o.id = oi.order_id
-    LEFT JOIN products p ON oi.product_id = p.id
-    WHERE o.id = ?
-  `,
+      SELECT 
+        o.id,
+        o.user_id as userId,
+        o.order_date as orderDate,
+        o.total_amount as totalAmount,
+        o.created_at as createdAt,
+        o.updated_at as updatedAt,
+        oi.id as item_id, 
+        oi.product_id as productId, 
+        oi.quantity, 
+        oi.unit_price as unitPrice, 
+        oi.created_at as itemCreatedAt,
+        p.name as productName
+      FROM orders o
+      LEFT JOIN order_items oi ON o.id = oi.order_id
+      LEFT JOIN products p ON oi.product_id = p.id
+      WHERE o.id = ?
+      `,
       [id]
     );
 
-    if (!order) return null;
+    if (!orders.length) return null;
 
-    const items = await query(
-      `
-    SELECT 
-      oi.*,
-      p.name as product_name
-    FROM order_items oi
-    JOIN products p ON oi.product_id = p.id
-    WHERE oi.order_id = ?
-  `,
-      [id]
-    );
-
-    return {
-      ...order,
-      items: items.map((item: any) => ({
-        id: item.id,
-        productId: item.product_id,
-        productName: item.product_name,
-        quantity: item.quantity,
-        unitPrice: item.unit_price,
-        createdAt: item.created_at,
-      })),
+    // Agrupar itens
+    const orderData = {
+      id: orders[0].id,
+      userId: orders[0].userId,
+      orderDate: orders[0].orderDate ? new Date(orders[0].orderDate) : null,
+      totalAmount: orders[0].totalAmount,
+      createdAt: orders[0].createdAt ? new Date(orders[0].createdAt) : null,
+      updatedAt: orders[0].updatedAt ? new Date(orders[0].updatedAt) : null,
+      items: [] as any[],
     };
+
+    orders.forEach((row: any) => {
+      if (row.item_id) {
+        orderData.items.push({
+          id: row.item_id,
+          productId: row.productId,
+          productName: row.productName,
+          quantity: row.quantity,
+          unitPrice: row.unitPrice,
+          createdAt: row.itemCreatedAt ? new Date(row.itemCreatedAt) : null,
+        });
+      }
+    });
+
+    return orderData as IOrder;
   }
 }
