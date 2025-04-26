@@ -72,4 +72,27 @@ export default class OrderController {
       }
     }
   };
+
+  getCount = async (_: Request, res: Response) => {
+    try {
+      const ordersLenght = (await this.orderService.getAllOrders()).length;
+
+      const response = {
+        data: ordersLenght,
+        links: {
+          self: { method: "GET", href: "/orders/count" },
+          create: { method: "POST", href: "/orders" },
+        },
+      };
+
+      res.status(200).json(response);
+    } catch (error) {
+      if (error instanceof CustomError) {
+        res.status(error.status).json({ message: error.message });
+      } else {
+        console.error("Get all orders error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    }
+  };
 }

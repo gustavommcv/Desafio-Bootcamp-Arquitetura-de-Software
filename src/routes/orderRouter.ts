@@ -10,11 +10,14 @@ const orderController = container.get(OrderController);
 
 orderRouter.get("/", orderController.getAllOrders.bind(orderController));
 
+orderRouter.get("/count", orderController.getCount.bind(orderController));
+
 orderRouter.get(
   "/:id",
   param("id").isUUID().withMessage("Invalid order ID"),
   validationErrors,
   orderController.getOrderById.bind(orderController)
 );
+
 
 export default orderRouter;
