@@ -9,6 +9,14 @@ export default class ProductServiceImp implements ProductService {
     @inject("ProductRepository") private productRepository: ProductRepository
   ) {}
 
+  async findProductsByName(name: string): Promise<Product[]> {
+    const searchName = name.trim();
+
+    const products = await this.productRepository.findByName(searchName);
+
+    return products as Product[];
+  }
+
   async findProductById(id: UUID): Promise<Product> {
     const data = await this.productRepository.findByPK(id);
 

@@ -41,23 +41,52 @@ export default class ProductController {
   };
 
   getProductById = async (request: Request, response: Response) => {
-      try {
-        const { id } = matchedData(request);
-  
-        const product = await this.productService.findProductById(id);
-  
-        response.status(200).json({
-          data: product,
-          links: this.getProductLinks(product.id),
-        });
-      } catch (error) {
-        if (error instanceof Error)
-          if (error instanceof CustomError) {
-            response.status(error.status).json({ message: error.message });
-          } else {
-            console.error("Internal Error:", error);
-            response.status(500).json({ error: "Internal Server Error" });
-          }
-      }
-    };
+    try {
+      const { id } = matchedData(request);
+
+      const product = await this.productService.findProductById(id);
+
+      response.status(200).json({
+        data: product,
+        links: this.getProductLinks(product.id),
+      });
+    } catch (error) {
+      if (error instanceof Error)
+        if (error instanceof CustomError) {
+          response.status(error.status).json({ message: error.message });
+        } else {
+          console.error("Internal Error:", error);
+          response.status(500).json({ error: "Internal Server Error" });
+        }
+    }
+  };
+
+  getProductByName = async (request: Request, response: Response) => {
+    try {
+      const { name } = matchedData(request);
+
+      const products = await this.productService.findProductsByName(name);
+
+      const productsWithLinks = products.map((product) => ({
+        ...product,
+        links: this.getProductLinks(product.id),
+      }));
+
+      response.status(200).json({
+        data: productsWithLinks,
+        links: {
+          self: { method: "GET", href: "/products" },
+          create: { method: "POST", href: "/products" },
+        },
+      });
+    } catch (error) {
+      if (error instanceof Error)
+        if (error instanceof CustomError) {
+          response.status(error.status).json({ message: error.message });
+        } else {
+          console.error("Internal Error:", error);
+          response.status(500).json({ error: "Internal Server Error" });
+        }
+    }
+  };
 }

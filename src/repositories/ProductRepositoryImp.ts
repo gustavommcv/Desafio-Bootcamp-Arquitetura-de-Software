@@ -11,6 +11,20 @@ export default class ProductRepositoryImp implements ProductRepository {
     this.tableName = "products";
   }
 
+  async findByName(name: string): Promise<IProduct[]> {
+    const results = await query(
+      `SELECT * FROM ${this.tableName}
+     WHERE name LIKE ?`,
+      [`%${name}%`] 
+    );
+
+    if (results.length === 0) {
+      throw new CustomError("No products found with that name", 404);
+    }
+
+    return results as IProduct[];
+  }
+
   async findByPK(pk: UUID): Promise<IProduct> {
     const results = await query(
       `SELECT * FROM ${this.tableName}
