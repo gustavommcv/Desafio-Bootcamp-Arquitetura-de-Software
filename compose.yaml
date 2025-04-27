@@ -1,8 +1,32 @@
 services:
-  db:
-    image: mariadb
-    restart: always
-    environment:
-      MARIADB_ROOT_PASSWORD: example
+  backend:
+    build: .
     ports:
-      - 3306:3306
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+      - DB_USER=root
+      - DB_ROOT_PASSWORD=example
+      - DB_NAME=bootcamp_desafio
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      - mariadb
+    restart: unless-stopped
+
+  mariadb:
+    build: ./mariadb
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=example
+      - MYSQL_DATABASE=bootcamp_desafio
+    volumes:
+      - mariadb_data:/var/lib/mysql
+    restart: unless-stopped
+
+volumes:
+  mariadb_data:
