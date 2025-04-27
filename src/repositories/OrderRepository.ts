@@ -15,6 +15,6 @@ export default interface OrderRepository {
       items?: Array<{ productId: string; quantity: number }>;
     }
   ): Promise<IOrder>;
-  //   deleteByPK(id: UUID): Promise<void>;
+  delete(id: string): Promise<void>;
   //   findByUserId(userId: UUID): Promise<IOrder[]>;
 }

@@ -180,4 +180,17 @@ export default class OrderServiceImp implements OrderService {
       new Date(orderData.updatedAt)
     );
   }
+
+  async deleteOrder(id: string): Promise<void> {
+    if (!id) {
+      throw new CustomError("Order ID is required", 400);
+    }
+    
+    const order = await this.orderRepository.findById(id);
+    if (!order) {
+      throw new CustomError("Order not found", 404);
+    }
+
+    await this.orderRepository.delete(id);
+  }
 }

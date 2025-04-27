@@ -37,6 +37,13 @@ orderRouter.get(
   orderController.searchOrders.bind(orderController)
 );
 
+orderRouter.delete(
+  "/:id",
+  param("id").isUUID().withMessage("Invalid order ID"),
+  validationErrors,
+  orderController.deleteOrder.bind(orderController)
+);
+
 orderRouter.get(
   "/:id",
   param("id").isUUID().withMessage("Invalid order ID"),

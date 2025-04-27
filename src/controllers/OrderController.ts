@@ -185,4 +185,19 @@ export default class OrderController {
       }
     }
   }
+
+  async deleteOrder(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      await this.orderService.deleteOrder(id);
+      res.status(204).send();
+    } catch (error) {
+      if (error instanceof CustomError) {
+        res.status(error.status).json({ message: error.message });
+      } else {
+        console.error("Create order error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    }
+  }
 }

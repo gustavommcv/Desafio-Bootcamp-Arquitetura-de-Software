@@ -15,6 +15,6 @@ export default interface OrderService {
       items?: Array<{ productId: string; quantity: number }>;
     }
   ): Promise<Order>;
-  //   deleteOrder(id: UUID): Promise<void>;
+  deleteOrder(id: string): Promise<void>;
   //   getUserOrders(userId: UUID): Promise<Order[]>;
 }

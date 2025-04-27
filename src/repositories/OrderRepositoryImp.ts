@@ -317,4 +317,8 @@ export default class OrderRepositoryImp implements OrderRepository {
 
     return updatedOrder;
   }
+
+  async delete(id: string): Promise<void> {
+    await query("DELETE FROM orders WHERE id = ?", [id]);
+  }
 }
