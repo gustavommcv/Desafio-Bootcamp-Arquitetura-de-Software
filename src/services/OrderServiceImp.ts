@@ -131,4 +131,53 @@ export default class OrderServiceImp implements OrderService {
       new Date(orderData.updatedAt)
     );
   }
+
+  // Adicione na classe OrderServiceImp
+  async updateOrder(
+    id: string,
+    order: {
+      userId?: string;
+      items?: Array<{ productId: string; quantity: number }>;
+    }
+  ): Promise<Order> {
+    if (!id) {
+      throw new CustomError("Order ID is required", 400);
+    }
+
+    if (order.items && order.items.length === 0) {
+      throw new CustomError("Order must have at least one item", 400);
+    }
+
+    if (order.items) {
+      for (const item of order.items) {
+        if (!item.productId) {
+          throw new CustomError("Product ID is required for all items", 400);
+        }
+        if (item.quantity <= 0) {
+          throw new CustomError("Quantity must be greater than 0", 400);
+        }
+      }
+    }
+
+    const orderData = await this.orderRepository.update(id, order);
+
+    return new Order(
+      orderData.id,
+      orderData.userId,
+      new Date(orderData.orderDate),
+      orderData.totalAmount,
+      orderData.items.map(
+        (item) =>
+          new OrderItem(
+            item.id,
+            item.productId,
+            item.quantity,
+            item.unitPrice,
+            new Date(item.createdAt)
+          )
+      ),
+      new Date(orderData.createdAt),
+      new Date(orderData.updatedAt)
+    );
+  }
 }

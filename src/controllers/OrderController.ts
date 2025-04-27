@@ -165,4 +165,24 @@ export default class OrderController {
       }
     }
   };
+
+  async updateOrder(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { userId, items } = req.body;
+
+      const updatedOrder = await this.orderService.updateOrder(id, {
+        userId,
+        items,
+      });
+      res.status(200).json(updatedOrder.toResponseDTO());
+    } catch (error) {
+      if (error instanceof CustomError) {
+        res.status(error.status).json({ message: error.message });
+      } else {
+        console.error("Create order error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    }
+  }
 }

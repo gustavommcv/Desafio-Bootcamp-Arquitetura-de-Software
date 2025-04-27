@@ -1,4 +1,4 @@
-import { IOrder, Order } from "../models/Order";
+import { Order } from "../models/Order";
 
 export default interface OrderService {
   getAllOrders(): Promise<Order[]>;
@@ -6,9 +6,15 @@ export default interface OrderService {
   getOrderById(id: string): Promise<Order>;
   createOrder(order: {
     userId: string;
-    items: Array<{ productId: string; quantity: number; }>;
+    items: Array<{ productId: string; quantity: number }>;
   }): Promise<Order>;
-  //   updateOrder(id: UUID, updates: Partial<{ status: string }>): Promise<Order>;
+  updateOrder(
+    id: string,
+    order: {
+      userId?: string;
+      items?: Array<{ productId: string; quantity: number }>;
+    }
+  ): Promise<Order>;
   //   deleteOrder(id: UUID): Promise<void>;
   //   getUserOrders(userId: UUID): Promise<Order[]>;
 }

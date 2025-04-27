@@ -1,5 +1,5 @@
 import { query } from "../database/database";
-import { IOrder } from "../models/Order";
+import { IOrder, OrderItem } from "../models/Order";
 import CustomError from "../util/CustomError";
 import OrderRepository from "./OrderRepository";
 
@@ -225,5 +225,96 @@ export default class OrderRepositoryImp implements OrderRepository {
     }
 
     return createdOrder;
+  }
+
+  async update(
+    id: string,
+    order: {
+      userId?: string;
+      items?: Array<{ productId: string; quantity: number }>;
+    }
+  ): Promise<IOrder> {
+    const existingOrder = await this.findById(id);
+    if (!existingOrder) {
+      throw new CustomError(`Order with ID ${id} not found`, 404);
+    }
+
+    let userId = existingOrder.userId;
+    if (order.userId) {
+      const [user] = await query("SELECT id FROM users WHERE id = ?", [
+        order.userId,
+      ]);
+      if (!user) {
+        throw new CustomError(`User with ID ${order.userId} not found`, 404);
+      }
+      userId = order.userId;
+    }
+
+    let items = existingOrder.items;
+    let totalAmount = existingOrder.totalAmount;
+
+    if (order.items) {
+      const itemsWithPrices = await Promise.all(
+        order.items.map(async (item) => {
+          const [product] = await query(
+            "SELECT id, price, name FROM products WHERE id = ?",
+            [item.productId]
+          );
+
+          if (!product) {
+            throw new CustomError(
+              `Product with ID ${item.productId} not found`,
+              404
+            );
+          }
+
+          return {
+            ...item,
+            unitPrice: product.price,
+            productName: product.name,
+          };
+        })
+      );
+
+      totalAmount = itemsWithPrices.reduce(
+        (sum, item) => sum + item.quantity * item.unitPrice,
+        0
+      );
+
+      await query("DELETE FROM order_items WHERE order_id = ?", [id]);
+
+      for (const item of itemsWithPrices) {
+        await query(
+          `INSERT INTO order_items (id, order_id, product_id, quantity, unit_price) 
+       VALUES (UUID(), ?, ?, ?, ?)`,
+          [id, item.productId, item.quantity, item.unitPrice]
+        );
+      }
+
+      items = itemsWithPrices.map(
+        (item) =>
+          new OrderItem(
+            "",
+            item.productId,
+            item.quantity,
+            item.unitPrice,
+            new Date()
+          )
+      );
+    }
+
+    await query(
+      `UPDATE orders 
+   SET user_id = ?, total_amount = ?, updated_at = CURRENT_TIMESTAMP
+   WHERE id = ?`,
+      [userId, totalAmount, id]
+    );
+
+    const updatedOrder = await this.findById(id);
+    if (!updatedOrder) {
+      throw new CustomError("Failed to retrieve updated order", 500);
+    }
+
+    return updatedOrder;
   }
 }

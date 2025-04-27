@@ -8,7 +8,13 @@ export default interface OrderRepository {
     userId: string;
     items: Array<{ productId: string; quantity: number }>;
   }): Promise<IOrder>;
-  //   updateByPK(id: UUID, updates: Partial<IOrder>): Promise<IOrder>;
+  update(
+    id: string,
+    order: {
+      userId?: string;
+      items?: Array<{ productId: string; quantity: number }>;
+    }
+  ): Promise<IOrder>;
   //   deleteByPK(id: UUID): Promise<void>;
   //   findByUserId(userId: UUID): Promise<IOrder[]>;
 }

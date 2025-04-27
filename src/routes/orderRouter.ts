@@ -44,4 +44,29 @@ orderRouter.get(
   orderController.getOrderById.bind(orderController)
 );
 
+orderRouter.put(
+  "/:id",
+  [
+    param("id").isUUID().withMessage("Invalid order ID"),
+    body("userId")
+      .optional()
+      .isUUID()
+      .withMessage("User ID must be a valid UUID"),
+    body("items")
+      .optional()
+      .isArray({ min: 1 })
+      .withMessage("Order must have at least one item"),
+    body("items.*.productId")
+      .optional()
+      .isUUID()
+      .withMessage("Product ID must be a valid UUID"),
+    body("items.*.quantity")
+      .optional()
+      .isInt({ min: 1 })
+      .withMessage("Quantity must be at least 1"),
+  ],
+  validationErrors,
+  orderController.updateOrder.bind(orderController)
+);
+
 export default orderRouter;
