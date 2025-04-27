@@ -1,5 +1,5 @@
 import { inject, injectable } from "inversify";
-import { Order, OrderItem } from "../models/Order";
+import { IOrder, Order, OrderItem } from "../models/Order";
 import OrderService from "./OrderService";
 import OrderRepository from "../repositories/OrderRepository";
 import CustomError from "../util/CustomError";
@@ -86,6 +86,49 @@ export default class OrderServiceImp implements OrderService {
           new Date(orderData.createdAt),
           new Date(orderData.updatedAt)
         )
+    );
+  }
+
+  async createOrder(order: {
+    userId: string;
+    items: Array<{ productId: string; quantity: number }>;
+  }): Promise<Order> {
+    if (!order.userId) {
+      throw new CustomError("User ID is required", 400);
+    }
+
+    if (!order.items || order.items.length === 0) {
+      throw new CustomError("Order must have at least one item", 400);
+    }
+
+    for (const item of order.items) {
+      if (!item.productId) {
+        throw new CustomError("Product ID is required for all items", 400);
+      }
+      if (item.quantity <= 0) {
+        throw new CustomError("Quantity must be greater than 0", 400);
+      }
+    }
+
+    const orderData = await this.orderRepository.create(order);
+
+    return new Order(
+      orderData.id,
+      orderData.userId,
+      new Date(orderData.orderDate),
+      orderData.totalAmount,
+      orderData.items.map(
+        (item) =>
+          new OrderItem(
+            item.id,
+            item.productId,
+            item.quantity,
+            item.unitPrice,
+            new Date(item.createdAt)
+          )
+      ),
+      new Date(orderData.createdAt),
+      new Date(orderData.updatedAt)
     );
   }
 }

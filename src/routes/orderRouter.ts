@@ -1,12 +1,30 @@
 import { Router } from "express";
 import container from "../di-container";
 import OrderController from "../controllers/OrderController";
-import { param, query } from "express-validator";
+import { body, param, query } from "express-validator";
 import validationErrors from "../middlewares/validationErrors";
 
 const orderRouter = Router();
 
 const orderController = container.get(OrderController);
+
+orderRouter.post(
+  "/",
+  [
+    body("userId").isUUID().withMessage("User ID must be a valid UUID"),
+    body("items")
+      .isArray({ min: 1 })
+      .withMessage("Order must have at least one item"),
+    body("items.*.productId")
+      .isUUID()
+      .withMessage("Product ID must be a valid UUID"),
+    body("items.*.quantity")
+      .isInt({ min: 1 })
+      .withMessage("Quantity must be at least 1"),
+  ],
+  validationErrors,
+  orderController.createOrder.bind(orderController)
+);
 
 orderRouter.get("/", orderController.getAllOrders.bind(orderController));
 

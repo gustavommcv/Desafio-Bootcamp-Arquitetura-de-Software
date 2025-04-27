@@ -75,10 +75,10 @@ export default class OrderController {
 
   getCount = async (_: Request, res: Response) => {
     try {
-      const ordersLenght = (await this.orderService.getAllOrders()).length;
+      const ordersLength = (await this.orderService.getAllOrders()).length;
 
       const response = {
-        data: ordersLenght,
+        data: ordersLength,
         links: {
           self: { method: "GET", href: "/orders/count" },
           create: { method: "POST", href: "/orders" },
@@ -118,6 +118,49 @@ export default class OrderController {
         res.status(error.status).json({ message: error.message });
       } else {
         console.error("Search orders error:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+    }
+  };
+
+  createOrder = async (req: Request, res: Response) => {
+    try {
+      const { userId, items } = req.body;
+
+      if (!userId || !items) {
+        throw new CustomError("userId and items are required", 400);
+      }
+
+      if (!Array.isArray(items)) {
+        throw new CustomError("items must be an array", 400);
+      }
+
+      for (const item of items) {
+        if (!item.productId || item.quantity === undefined) {
+          throw new CustomError(
+            "Each item must have productId and quantity",
+            400
+          );
+        }
+      }
+
+      const order = await this.orderService.createOrder({
+        userId,
+        items: items.map((item) => ({
+          productId: item.productId,
+          quantity: item.quantity,
+        })),
+      });
+
+      res.status(201).json({
+        data: order.toResponseDTO(),
+        links: this.getOrderLinks(order.id),
+      });
+    } catch (error) {
+      if (error instanceof CustomError) {
+        res.status(error.status).json({ message: error.message });
+      } else {
+        console.error("Create order error:", error);
         res.status(500).json({ error: "Internal Server Error" });
       }
     }

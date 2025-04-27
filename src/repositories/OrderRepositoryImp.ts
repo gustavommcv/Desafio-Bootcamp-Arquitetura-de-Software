@@ -25,7 +25,6 @@ export default class OrderRepositoryImp implements OrderRepository {
     ORDER BY o.order_date DESC
   `);
 
-    // Agrupar itens por pedido
     const ordersMap = new Map<string, any>();
 
     orders.forEach((row: any) => {
@@ -82,7 +81,6 @@ export default class OrderRepositoryImp implements OrderRepository {
 
     if (!orders.length) return null;
 
-    // Agrupar itens
     const orderData = {
       id: orders[0].id,
       userId: orders[0].userId,
@@ -135,7 +133,6 @@ export default class OrderRepositoryImp implements OrderRepository {
       throw new CustomError("No orders found matching the search term", 404);
     }
 
-    // Agora busca os itens para cada pedido encontrado
     const ordersWithItems = await Promise.all(
       orders.map(async (order: any) => {
         const items = await query(
@@ -169,5 +166,64 @@ export default class OrderRepositoryImp implements OrderRepository {
     );
 
     return ordersWithItems;
+  }
+
+  async create(order: {
+    userId: string;
+    items: Array<{ productId: string; quantity: number }>;
+  }): Promise<IOrder> {
+    const [user] = await query("SELECT id FROM users WHERE id = ?", [
+      order.userId,
+    ]);
+    if (!user) {
+      throw new CustomError(`User with ID ${order.userId} not found`, 404);
+    }
+
+    const itemsWithPrices = await Promise.all(
+      order.items.map(async (item) => {
+        const [product] = await query(
+          "SELECT id, price FROM products WHERE id = ?",
+          [item.productId]
+        );
+
+        if (!product) {
+          throw new CustomError(
+            `Product with ID ${item.productId} not found`,
+            404
+          );
+        }
+
+        return {
+          ...item,
+          unitPrice: product.price,
+        };
+      })
+    );
+
+    const totalAmount = itemsWithPrices.reduce(
+      (sum, item) => sum + item.quantity * item.unitPrice,
+      0
+    );
+
+    const orderId = crypto.randomUUID();
+    await query(
+      `INSERT INTO orders (id, user_id, total_amount) VALUES (?, ?, ?)`,
+      [orderId, order.userId, totalAmount]
+    );
+
+    for (const item of itemsWithPrices) {
+      await query(
+        `INSERT INTO order_items (id, order_id, product_id, quantity, unit_price) 
+       VALUES (UUID(), ?, ?, ?, ?)`,
+        [orderId, item.productId, item.quantity, item.unitPrice]
+      );
+    }
+
+    const createdOrder = await this.findById(orderId);
+    if (!createdOrder) {
+      throw new CustomError("Failed to retrieve created order", 500);
+    }
+
+    return createdOrder;
   }
 }
