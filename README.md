@@ -1,5 +1,21 @@
 # Estrutura de Pastas e Explicação dos Componentes
 
+## Sumário
+
+1. [Estrutura do Projeto](#estrutura-do-projeto)
+2. [Rotas da API](#rotas-da-api)
+   - [Autenticação](#autenticação-auth)
+   - [Usuários](#usuários-users)
+   - [Produtos](#produtos-products)
+   - [Pedidos](#pedidos-orders)
+3. [Pré-requisitos](#pré-requisitos)
+4. [Instalação](#instalação)
+5. [Exemplo de Uso](#exemplo-de-uso)
+6. [Papel de Cada Componente](#papel-de-cada-componente)
+7. [Fluxo Arquitetural](#fluxo-arquitetural)
+8. [Padrões de Projeto Utilizados](#padrões-de-projeto-utilizados)
+9. [Tecnologias Utilizadas](#tecnologias-utilizadas)
+
 ## Estrutura do Projeto
 
     desafio-final-bootcamp/
