@@ -64,6 +64,58 @@
     ├── package.json # Dependências do projeto
     └── tsconfig.json # Configuração do TypeScript
 
+## Rotas da API
+
+A API possui os seguintes endpoints organizados por recurso:
+
+### Autenticação (`/auth`)
+| Método | Endpoint   | Descrição                          | Parâmetros                           |
+|--------|------------|------------------------------------|--------------------------------------|
+| POST   | /login     | Autentica um usuário               | email (string), password (string)    |
+| GET    | /logout    | Encerra a sessão do usuário        | -                                    |
+| POST   | /signup    | Cria uma nova conta de usuário     | name (string), email (string), password (string) |
+
+### Usuários (`/users`)
+| Método | Endpoint   | Descrição                          | Parâmetros                           |
+|--------|------------|------------------------------------|--------------------------------------|
+| GET    | /          | Lista todos os usuários            | -                                    |
+| GET    | /count     | Retorna contagem total de usuários | -                                    |
+| GET    | /search    | Busca usuários por nome            | name (query string)                  |
+| GET    | /:id       | Obtém usuário por ID               | id (UUID)                            |
+| DELETE | /          | Remove o usuário atual             | -                                    |
+| PUT    | /          | Atualiza dados do usuário          | name (opcional), email (opcional), password (opcional) |
+
+### Produtos (`/products`)
+| Método | Endpoint   | Descrição                          | Parâmetros                           |
+|--------|------------|------------------------------------|--------------------------------------|
+| GET    | /          | Lista todos os produtos            | -                                    |
+| GET    | /search    | Busca produtos por nome            | name (query string)                  |
+| GET    | /count     | Retorna contagem total de produtos | -                                    |
+| GET    | /:id       | Obtém produto por ID               | id (UUID)                            |
+| PUT    | /:id       | Atualiza um produto                | id (UUID), name (opcional), description (opcional), price (opcional > 0) |
+| DELETE | /:id       | Remove um produto                  | id (UUID)                            |
+| POST   | /          | Cria um novo produto               | name (string), description (string), price (number > 0) |
+
+### Pedidos (`/orders`)
+| Método | Endpoint   | Descrição                          | Parâmetros                           |
+|--------|------------|------------------------------------|--------------------------------------|
+| POST   | /          | Cria um novo pedido                | userId (UUID), items (array de {productId: UUID, quantity: number >= 1}) |
+| GET    | /          | Lista todos os pedidos             | -                                    |
+| GET    | /count     | Retorna contagem total de pedidos  | -                                    |
+| GET    | /search    | Busca pedidos por termo            | name (query string)                  |
+| DELETE | /:id       | Remove um pedido                   | id (UUID)                            |
+| GET    | /:id       | Obtém pedido por ID                | id (UUID)                            |
+| PUT    | /:id       | Atualiza um pedido                 | id (UUID), userId (opcional UUID), items (opcional array) |
+
+## Exemplo de Uso
+
+1. **Autenticação**:
+```bash
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com","password":"senha123"}'
+```
+
 ## Papel de Cada Componente
 
 ### Models (Modelos)
@@ -123,5 +175,3 @@ Banco → Repository → Service → Controller → Cliente
 - Abstrage a camada de acesso a dados
 - Centraliza operações de banco
 
-### Arquitetura em Camadas
-- Apresentação → Aplicação → Domínio → Infraestrutura
