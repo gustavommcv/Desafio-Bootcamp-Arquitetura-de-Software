@@ -175,3 +175,13 @@ Banco → Repository → Service → Controller → Cliente
 - Abstrage a camada de acesso a dados
 - Centraliza operações de banco
 
+# 🛠 Tecnologias Utilizadas
+
+| Tecnologia          | Finalidade                          |
+|---------------------|-------------------------------------|
+| Node.js             | Ambiente de execução JavaScript     |
+| TypeScript          | Tipagem estática                    |
+| Express             | Framework web para API REST         |
+| MariaDB             | Banco de dados relacional           |
+| Docker              | Containerização                    |
+| InversifyJS         | Injeção de dependência              |
