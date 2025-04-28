@@ -107,6 +107,24 @@ A API possui os seguintes endpoints organizados por recurso:
 | GET    | /:id       | Obtém pedido por ID                | id (UUID)                            |
 | PUT    | /:id       | Atualiza um pedido                 | id (UUID), userId (opcional UUID), items (opcional array) |
 
+## Pré-requisitos
+
+- Docker
+- Docker Compose
+
+## Instalação
+
+1. Clone o repositório:
+```bash
+git clone https://github.com/gustavommcv/Desafio-Bootcamp-Arquitetura-de-Software.git
+cd Desafio-Bootcamp-Arquitetura-de-Software
+```
+
+2. Inicie os containers com Docker Compose:
+```bash
+docker-compose up
+```
+
 ## Exemplo de Uso
 
 1. **Autenticação**:
