@@ -175,7 +175,7 @@ Banco → Repository → Service → Controller → Cliente
 - Abstrage a camada de acesso a dados
 - Centraliza operações de banco
 
-# 🛠 Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 | Tecnologia          | Finalidade                          |
 |---------------------|-------------------------------------|
