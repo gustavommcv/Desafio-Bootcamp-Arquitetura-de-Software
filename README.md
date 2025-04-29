@@ -16,6 +16,9 @@
 8. [Padrões de Projeto Utilizados](#padrões-de-projeto-utilizados)
 9. [Tecnologias Utilizadas](#tecnologias-utilizadas)
 
+## UML
+![image](https://github.com/user-attachments/assets/1e6a89b2-a050-4841-9af5-e45c2f810247)
+
 ## Estrutura do Projeto
 
     desafio-final-bootcamp/
